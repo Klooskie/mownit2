@@ -140,6 +140,8 @@ int main(){
 
     elimination(n, A, X);
 
+    cout<<"xD"<<endl;
+    
 
     //wypsiz
     for(int i = 0; i < n; i++){
