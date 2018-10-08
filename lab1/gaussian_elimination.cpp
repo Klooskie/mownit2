@@ -86,7 +86,7 @@ void calculate_variables(int n, number ** A, number * X){
             s -= A[i][j] * X[j];
         }
         if(A[i][i] == 0){
-            cout << "\n\nZero na przekątnej - uklad nie ma dokladnie 1 rozwiazania" << endl;
+            cout << "\nZero na przekątnej - uklad nie ma dokladnie 1 rozwiazania" << endl;
             exit(0);
         }
         X[i] = s / A[i][i];
@@ -150,14 +150,6 @@ int main(){
         for(int j = 0; j <= n; j++)
             cin >> A[i][j];
 
-    //wypisanie ukladu
-    // cout<<"\n\n";
-    // for(int i = 0; i < n; i++){
-    //     for(int j = 0; j < n; j++){
-    //         cout << A[i][j] << " ";
-    //     }
-    //     cout << " |  x" << i << "  |  " << A[i][n] << endl;
-    // }
     cout << "\nmacierz rozszerzona ukladu" << endl;
     print_matrix(n, A);
 
