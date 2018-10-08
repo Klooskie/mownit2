@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 using namespace std;
 typedef double number;
 
@@ -38,13 +39,13 @@ void swap_rows(int n, number ** A, int row1, int row2){
     }
 }
 
-void elimination(int n, number ** A, number * X){
+void elimination(int n, number ** A){
 
     int row = 0; //nr rzedu pivotu
     int column = 0; //nr kolumny pivtu
     while(row < n and column <= n){
 
-        //znajdywanie najwiekszej wartosci w ktej kolumnie w pozostalych wierszach i indeksu wiersza
+        //znajdywanie najwiekszej wartosci w ktej kolumnie w pozostalych wierszach
         number max_value = 0;
         int max_value_row = row;
 
@@ -63,15 +64,14 @@ void elimination(int n, number ** A, number * X){
             column++;
         }
         else{
-            //jesli w wierszy pivocie mamy 0 w kolumnie pivocie to podmieniamy rzad
+            //jesli w wierszu pivocie mamy 0 w kolumnie pivocie to podmieniamy rzad
             if(A[row][column] == 0)
                 swap_rows(n, A, row, max_value_row);
 
-            //dla pozostalych wierszy
+            //dla pozostalych wierszy odejmujemy odpowiedno przemnozony rzad pivot
             for(int i = row + 1; i < n; i++){
                 number factor = A[i][column] / A[row][column];
 
-                //odejmujemy odpowiedno przemnozony rzad pivot
                 A[i][column] = 0;
                 for(int j = column + 1; j <= n; j++){
                     A[i][j] = A[i][j] - factor * A[row][j];
@@ -82,9 +82,9 @@ void elimination(int n, number ** A, number * X){
             column++;
         }
     }
+}
 
-    cout<<"XD"<<endl;
-
+void count_variables(int n, number ** A, number * X){
     //wyliczanie niewiadomych
     for(int i = n - 1; i >= 0; i--){
 
@@ -93,19 +93,58 @@ void elimination(int n, number ** A, number * X){
             s -= A[i][j] * X[j];
         }
         if(A[i][i] == 0){
-            cout<<"LOOOOL"<<endl;
-            exit(1);
+            cout<<"Zero na przekątnej - uklad nie ma dokladnie 1 rozwiazania"<<endl;
+            return;
         }
         X[i] = s / A[i][i];
     }
+}
 
-    cout<<"XD2"<<endl;
+void multiply(int n, number ** A, number * X, number * B){
+
+    for(int i = 0; i < n; i++){
+
+        B[i] = 0;
+
+        for(int j = i; j < n; j++){
+
+            B[i] += A[i][j] * X[j];
+
+        }
+    }
+
+}
+
+void count_differences(int n, number ** A, number * B, number * Diff){
+
+    for(int i = 0; i < n; i++){
+        Diff[i] = absolute(B[i] - A[i][n]);
+    }
+
+}
+
+number euclidean_norm(int n, number * X){
+    number sum_of_squares = 0;
+    for(int i = 0; i < n; i++){
+        sum_of_squares += X[i] * X[i];
+    }
+    return sqrt(sum_of_squares);
+}
+
+number maximum_norm(int n, number * X){
+    number max_number = 0;
+    for(int i = 0; i < n; i++){
+        number tmp = absolute(X[i]);
+
+        if(tmp > max_number)
+            max_number = tmp;
+    }
+    return max_number;
 }
 
 int main(){
 
-    number **A;
-    number *X;
+    number **A; //rozszerzona macierz ukladu
     int n;
 
     cout << "wpisz liczbe niewiadomych" << endl;
@@ -115,8 +154,6 @@ int main(){
     A = new number*[n];
     for(int i = 0; i < n; i++)
         A[i] = new number[n + 1];
-
-    X = new number[n];
 
     printf("wpisz kolejno wiersze tablicy\n");
 
@@ -130,27 +167,53 @@ int main(){
         cin >> A[i][n];
 
     //wypisz
+    cout<<"\n\n";
     for(int i = 0; i < n; i++){
         for(int j = 0; j < n; j++){
             cout << A[i][j] << " ";
         }
-        cout << "| x" << i << " |  " << A[i][n] << endl;
+        cout << "\t|\tx" << i << "\t|\t" << A[i][n] << endl;
     }
 
 
-    elimination(n, A, X);
+    elimination(n, A);
 
-    cout<<"xD"<<endl;
-    
+    number *X;
+    X = new number[n];
+
+    count_variables(n, A, X);
 
     //wypsiz
+    cout<<"\n\n";
     for(int i = 0; i < n; i++){
         for(int j = 0; j < n; j++){
             cout << A[i][j] << " ";
         }
-        cout << "| " << X[i] << " |  " << A[i][n] << endl;
+        cout << "\t|\t" << X[i] << "\t|\t" << A[i][n] << endl;
     }
 
+
+    number * B = new number[n];
+    multiply(n, A, X, B);
+
+    cout<<"\n\n";
+    for(int i = 0; i < n; i++){
+        cout<<B[i]<<endl;
+    }
+
+    number * Diff = new number[n];
+    count_differences(n, A, B, Diff);
+
+    cout<<"\n\n";
+    for(int i = 0; i < n; i++){
+        cout<<Diff[i]<<endl;
+    }
+
+
+    number enorm = euclidean_norm(n, X);
+    number mnorm = maximum_norm(n, X);
+
+    cout<<"\n\n"<<enorm<<endl<<mnorm<<endl;
 }
 
 
