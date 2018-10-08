@@ -3,30 +3,23 @@
 using namespace std;
 typedef double number;
 
-//  h := 1 /* Initialization of the pivot row */
-//  k := 1 /* Initialization of the pivot column */
-//  while h ≤ m and k ≤ n
-//    /* Find the k-th pivot: */
-//    i_max := argmax (i = h ... m, abs(A[i, k]))
-//    if A[i_max, k] = 0
-//      /* No pivot in this column, pass to next column */
-//      k := k+1
-//    else
-//       swap rows(h, i_max)
-//       /* Do for all rows below pivot: */
-//       for i = h + 1 ... m:
-//          f := A[i, k] / A[h, k]
-//          /* Fill with zeros the lower part of pivot column: */
-//          A[i, k]  := 0
-//          /* Do for all remaining elements in current row: */
-//          for j = k + 1 ... n:
-//             A[i, j] := A[i, j] - A[h, j] * f
-//       /* Increase pivot row and column */
-//       h := h+1 
-//       k := k+1
+void print_vector(int n, number * A){
+    for(int i = 0; i < n; i++){
+        cout << A[i] << endl;
+    }
+}
+
+void print_matrix(int n, number ** A){
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            cout << A[i][j] << " ";
+        }
+        cout << " | " << A[i][n] << endl;
+    }
+}
 
 number absolute(number x){
-    return x < 0 ? (-1)*x : x;
+    return x < 0 ? (-1) * x : x;
 }
 
 void swap_rows(int n, number ** A, int row1, int row2){
@@ -39,7 +32,7 @@ void swap_rows(int n, number ** A, int row1, int row2){
     }
 }
 
-void elimination(int n, number ** A){
+void gaussian_elimination(int n, number ** A){
 
     int row = 0; //nr rzedu pivotu
     int column = 0; //nr kolumny pivtu
@@ -84,7 +77,7 @@ void elimination(int n, number ** A){
     }
 }
 
-void count_variables(int n, number ** A, number * X){
+void calculate_variables(int n, number ** A, number * X){
     //wyliczanie niewiadomych
     for(int i = n - 1; i >= 0; i--){
 
@@ -93,26 +86,16 @@ void count_variables(int n, number ** A, number * X){
             s -= A[i][j] * X[j];
         }
         if(A[i][i] == 0){
-            cout<<"\n\nZero na przekątnej - uklad nie ma dokladnie 1 rozwiazania"<<endl;
-            return;
+            cout << "\n\nZero na przekątnej - uklad nie ma dokladnie 1 rozwiazania" << endl;
+            exit(0);
         }
         X[i] = s / A[i][i];
-    }
-
-    //wypsiz
-    cout<<"\n\n";
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
-            cout << A[i][j] << " ";
-        }
-        cout << "\t|\t" << X[i] << "\t|\t" << A[i][n] << endl;
     }
 }
 
 void multiply(int n, number ** A, number * X, number * B){
 
     for(int i = 0; i < n; i++){
-
         B[i] = 0;
 
         for(int j = i; j < n; j++){
@@ -121,7 +104,6 @@ void multiply(int n, number ** A, number * X, number * B){
 
         }
     }
-
 }
 
 void count_differences(int n, number ** A, number * B, number * Diff){
@@ -157,62 +139,52 @@ int main(){
     int n;
 
     cout << "wpisz liczbe niewiadomych" << endl;
-
     cin >> n;
 
     A = new number*[n];
     for(int i = 0; i < n; i++)
         A[i] = new number[n + 1];
 
-    printf("wpisz kolejno wiersze tablicy\n");
-
+    cout << "podaj macierz rozszerzona rownania" << endl;
     for(int i = 0; i < n; i++)
-        for(int j = 0; j < n; j++)
+        for(int j = 0; j <= n; j++)
             cin >> A[i][j];
 
-    printf("wpisz wartosci wektora prawej strony\n");
+    //wypisanie ukladu
+    // cout<<"\n\n";
+    // for(int i = 0; i < n; i++){
+    //     for(int j = 0; j < n; j++){
+    //         cout << A[i][j] << " ";
+    //     }
+    //     cout << " |  x" << i << "  |  " << A[i][n] << endl;
+    // }
+    cout << "\nmacierz rozszerzona ukladu" << endl;
+    print_matrix(n, A);
 
-    for(int i = 0; i < n; i++)
-        cin >> A[i][n];
+    gaussian_elimination(n, A);
 
-    //wypisz
-    cout<<"\n\n";
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
-            cout << A[i][j] << " ";
-        }
-        cout << "\t|\tx" << i << "\t|\t" << A[i][n] << endl;
-    }
+    number * X = new number[n]; //wektor niewiadomych
 
+    calculate_variables(n, A, X);
+    cout << "\nmacierz rozszerzona ukladu po eliminacji gaussa" << endl;
+    print_matrix(n, A);
+    cout << "\nwektor niewiadomych wyliczony na podstawie schodkowej powyzszej macierzy" << endl;
+    print_vector(n, X);
 
-    elimination(n, A);
-
-    number * X;
-    X = new number[n];
-
-    count_variables(n, A, X);
-
-    number * B = new number[n];
+    number * B = new number[n]; //wektor prawej strony wyliczony na podstawie wyliczonego wektora niewiadomych
     multiply(n, A, X, B);
+    cout << "\nwektor prawej strony wyliczony na podstawie wektora niewiadomych" << endl;
+    print_vector(n, B);
 
-    cout<<"\n\n";
-    for(int i = 0; i < n; i++){
-        cout<<B[i]<<endl;
-    }
-
-    number * Diff = new number[n];
+    number * Diff = new number[n]; //wektor roznic, miedzy wyliczonym, a wejsciowym wetorem prawej strony
     count_differences(n, A, B, Diff);
-
-    cout<<"\n\n";
-    for(int i = 0; i < n; i++){
-        cout<<Diff[i]<<endl;
-    }
-
+    cout << "\nroznice miedzy wejsciowym, a wyliczonym na podstawie wektore niewiadomych wektorem prawej strony" << endl;
+    print_vector(n, Diff);
 
     number enorm = euclidean_norm(n, X);
     number mnorm = maximum_norm(n, X);
 
-    cout<<"\n\n"<<enorm<<endl<<mnorm<<endl;
+    cout<<"\nnorma euklidesowa wektora niewiadomych - "<<enorm<<"\nnorma maksimum wektora niewiadomych - "<<mnorm<<endl;
 }
 
 
