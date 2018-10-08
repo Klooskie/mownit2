@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <cstdlib>
 using namespace std;
 typedef double number;
 
@@ -38,7 +39,7 @@ void gaussian_elimination(int n, number ** A){
     int column = 0; //nr kolumny pivtu
     while(row < n and column <= n){
 
-        //znajdywanie najwiekszej wartosci w ktej kolumnie w pozostalych wierszach
+        //znajdywanie najwiekszej wartosci w kolumnie pivocie w pozostalych wierszach
         number max_value = 0;
         int max_value_row = row;
 
@@ -82,7 +83,7 @@ void calculate_variables(int n, number ** A, number * X){
     for(int i = n - 1; i >= 0; i--){
 
         int s = A[i][n];
-        for(int j = n - 1; j > i; j--){ //popraw warunek konca
+        for(int j = n - 1; j > i; j--){
             s -= A[i][j] * X[j];
         }
         if(A[i][i] == 0){
@@ -98,7 +99,7 @@ void multiply(int n, number ** A, number * X, number * B){
     for(int i = 0; i < n; i++){
         B[i] = 0;
 
-        for(int j = i; j < n; j++){
+        for(int j = 0; j < n; j++){
 
             B[i] += A[i][j] * X[j];
 
@@ -133,7 +134,77 @@ number maximum_norm(int n, number * X){
     return max_number;
 }
 
+void old_labs(){
+
+    int n;
+    cout << "wpisz rozmiar macierzy" << endl;
+    cin >> n;
+
+    //alokacja macierzy
+    number ** A = new number * [n];
+    for(int i = 0; i < n; i++)
+        A[i] = new number[n + 1];
+
+    //wypelnienie pierwszego wiersza
+    for(int i = 0; i < n; i++){
+        A[0][i] = 1;
+    }
+    
+    //wypelnienie reszty macierzy
+    for(int i = 1; i < n; i++){
+        for(int j = 0; j < n; j++){
+            A[i][j] = 1 / ((number) i + (number) j + 1); //+1 bo indeksy od 0
+        }
+    }
+
+    number * X = new number[n];
+    srand(time(NULL));
+    for(int i = 0; i < n; i++){
+        if(rand() % 2)
+            X[i] = 1;
+        else
+            X[i] = -1;
+    }
+
+    cout << "\nwektor niewiadomych" <<endl;
+    print_vector(n, X);
+
+    number * B = new number[n];
+    multiply(n, A, X, B);
+
+    cout << "\nwektor prawej strony" << endl;
+    print_vector(n, B);
+
+    for(int i = 0; i < n; i++){
+        A[i][n] = B[i];
+    }
+
+    cout << "\nmacierz" << endl;
+    print_matrix(n, A);
+
+    gaussian_elimination(n, A);
+    cout << "\nmacierz po eliminacji" << endl;
+    print_matrix(n, A);
+
+    number * X2 = new number[n];
+    calculate_variables(n, A, X2);
+
+    cout << "\nwyliczony wektor niewiadomych" << endl;
+    print_vector(n, X2);
+
+    
+    // B = new number[n];
+    // multiply(n, A, X2, B);
+    // cout<<"\nwektor prawej strony na podstawie nowego wektora niewiadomych"<<endl;
+    // print_vector(n, B);
+
+ 
+    cout << "\nnorma euk X " << euclidean_norm(n, X) << "\nnorma euk X2 " << euclidean_norm(n, X2) <<endl;
+}
+
 int main(){
+
+    // old_labs(); exit(0);
 
     number **A; //rozszerzona macierz ukladu
     int n;
@@ -141,7 +212,7 @@ int main(){
     cout << "wpisz liczbe niewiadomych" << endl;
     cin >> n;
 
-    A = new number*[n];
+    A = new number * [n];
     for(int i = 0; i < n; i++)
         A[i] = new number[n + 1];
 
