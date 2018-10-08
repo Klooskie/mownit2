@@ -93,10 +93,19 @@ void count_variables(int n, number ** A, number * X){
             s -= A[i][j] * X[j];
         }
         if(A[i][i] == 0){
-            cout<<"Zero na przekątnej - uklad nie ma dokladnie 1 rozwiazania"<<endl;
+            cout<<"\n\nZero na przekątnej - uklad nie ma dokladnie 1 rozwiazania"<<endl;
             return;
         }
         X[i] = s / A[i][i];
+    }
+
+    //wypsiz
+    cout<<"\n\n";
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            cout << A[i][j] << " ";
+        }
+        cout << "\t|\t" << X[i] << "\t|\t" << A[i][n] << endl;
     }
 }
 
@@ -178,20 +187,10 @@ int main(){
 
     elimination(n, A);
 
-    number *X;
+    number * X;
     X = new number[n];
 
     count_variables(n, A, X);
-
-    //wypsiz
-    cout<<"\n\n";
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
-            cout << A[i][j] << " ";
-        }
-        cout << "\t|\t" << X[i] << "\t|\t" << A[i][n] << endl;
-    }
-
 
     number * B = new number[n];
     multiply(n, A, X, B);
