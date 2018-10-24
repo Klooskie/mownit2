@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
+#include <sys/time.h>
 using namespace std;
 typedef float number;
 
@@ -347,14 +348,14 @@ void zad3(){
         for(int j = 0; j < n + 1; j++)
             A2[i][j] = A[i][j];
 
-    long int time_start, time_end;
+    struct timeval time_start, time_end;
 
-    time_start = clock();
+    gettimeofday(&time_start, NULL);
     zad3_gauss(n, A, X, X2);
-    time_end = clock();
+    gettimeofday(&time_end, NULL);
 
     cout << "\n\nEliminacja Gaussa:" << endl;
-    time_printer(time_start, time_end);
+    cout << "Czas trwania: " << (double)(time_end.tv_sec - time_start.tv_sec) + ((double)time_end.tv_usec - (double)time_start.tv_usec) / 1000000 << endl;
 
     cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
     cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X2) <<endl;
@@ -364,12 +365,12 @@ void zad3(){
     cout << "norma maksimum wektora obliczonego " << maximum_norm(n, X2) <<endl;
     cout << "roznica norm maksimum " << absolute(maximum_norm(n, X) - maximum_norm(n, X2)) << endl;
 
-    time_start = clock();
+    gettimeofday(&time_start, NULL);
     zad3_thomas(n, A2, X, X3);
-    time_end = clock();
+    gettimeofday(&time_end, NULL);
 
     cout << "\n\nAlgorytm Thomasa:" << endl;
-    time_printer(time_start, time_end);
+    cout << "Czas trwania: " << (double)(time_end.tv_sec - time_start.tv_sec) + ((double)time_end.tv_usec - (double)time_start.tv_usec) / 1000000 << endl;
 
     cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
     cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X3) <<endl;
