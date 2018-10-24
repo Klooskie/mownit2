@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdlib>
 using namespace std;
-typedef double number;
+typedef float number;
 
 void print_vector(int n, number * A){
     for(int i = 0; i < n; i++){
@@ -82,7 +82,7 @@ void calculate_variables(int n, number ** A, number * X){
     //wyliczanie niewiadomych
     for(int i = n - 1; i >= 0; i--){
 
-        int s = A[i][n];
+        number s = A[i][n];
         for(int j = n - 1; j > i; j--){
             s -= A[i][j] * X[j];
         }
@@ -107,14 +107,6 @@ void multiply(int n, number ** A, number * X, number * B){
     }
 }
 
-void count_differences(int n, number ** A, number * B, number * Diff){
-
-    for(int i = 0; i < n; i++){
-        Diff[i] = absolute(B[i] - A[i][n]);
-    }
-
-}
-
 number euclidean_norm(int n, number * X){
     number sum_of_squares = 0;
     for(int i = 0; i < n; i++){
@@ -134,7 +126,7 @@ number maximum_norm(int n, number * X){
     return max_number;
 }
 
-void old_labs(){
+void zad1(){
 
     int n;
     cout << "wpisz rozmiar macierzy" << endl;
@@ -153,11 +145,186 @@ void old_labs(){
     //wypelnienie reszty macierzy
     for(int i = 1; i < n; i++){
         for(int j = 0; j < n; j++){
-            A[i][j] = 1 / ((number) i + (number) j + 1); //+1 bo indeksy od 0
+            A[i][j] = ((number) 1) / ((number) i + (number) j + 1); //+1 bo indeksy od 0
         }
     }
 
     number * X = new number[n];
+    // srand(time(NULL));
+    for(int i = 0; i < n; i++){
+        if(rand() % 2)
+            X[i] = 1;
+        else
+            X[i] = -1;
+    }
+
+    cout << "\nwektor niewiadomych - x" <<endl;
+    print_vector(n, X);
+
+    number * B = new number[n];
+    multiply(n, A, X, B);
+
+    cout << "\nwektor prawej strony - b" << endl;
+    print_vector(n, B);
+
+    for(int i = 0; i < n; i++){
+        A[i][n] = B[i];
+    }
+
+    // cout << "\nmacierz" << endl;
+    // print_matrix(n, A);
+
+    gaussian_elimination(n, A);
+    // cout << "\nmacierz po eliminacji" << endl;
+    // print_matrix(n, A);
+
+    number * X2 = new number[n];
+    calculate_variables(n, A, X2);
+
+    cout << "\nwyliczony wektor niewiadomych" << endl;
+    print_vector(n, X2);
+
+    cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
+    cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X2) <<endl;
+    cout << "roznica norm euklidesowych " << absolute(euclidean_norm(n, X) - euclidean_norm(n, X2)) << endl;
+
+    cout << "\nnorma maksimum wektora zadanego " << maximum_norm(n, X) << endl;
+    cout << "norma maksimum wektora obliczonego " << maximum_norm(n, X2) <<endl;
+    cout << "roznica norm maksimum " << absolute(maximum_norm(n, X) - maximum_norm(n, X2)) << endl;
+}
+
+void zad2(){
+
+    int n;
+    cout << "wpisz rozmiar macierzy" << endl;
+    cin >> n;
+
+    //alokacja macierzy
+    number ** A = new number * [n];
+    for(int i = 0; i < n; i++)
+        A[i] = new number[n + 1];
+
+    //wypelnienie macierzy
+    for(int i = 0; i < n; i++){
+        for(int j = i; j < n; j++){
+            A[i][j] = 2 * ((number) (i + 1)) / ((number) (j + 1));
+        }
+    }
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < i; j++){
+            A[i][j] = A[j][i];
+        }
+    }
+
+    number * X = new number[n];
+    // srand(time(NULL));
+    for(int i = 0; i < n; i++){
+        if(rand() % 2)
+            X[i] = 1;
+        else
+            X[i] = -1;
+    }
+
+    cout << "\nwektor niewiadomych - x" <<endl;
+    print_vector(n, X);
+
+    number * B = new number[n];
+    multiply(n, A, X, B);
+
+    cout << "\nwektor prawej strony - b" << endl;
+    print_vector(n, B);
+
+    for(int i = 0; i < n; i++){
+        A[i][n] = B[i];
+    }
+
+    // cout << "\nmacierz" << endl;
+    // print_matrix(n, A);
+
+    gaussian_elimination(n, A);
+    // cout << "\nmacierz po eliminacji" << endl;
+    // print_matrix(n, A);
+
+    number * X2 = new number[n];
+    calculate_variables(n, A, X2);
+
+    cout << "\nwyliczony wektor niewiadomych" << endl;
+    print_vector(n, X2);
+
+    cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
+    cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X2) <<endl;
+    cout << "roznica norm euklidesowych " << absolute(euclidean_norm(n, X) - euclidean_norm(n, X2)) << endl;
+
+    cout << "\nnorma maksimum wektora zadanego " << maximum_norm(n, X) << endl;
+    cout << "norma maksimum wektora obliczonego " << maximum_norm(n, X2) <<endl;
+    cout << "roznica norm maksimum " << absolute(maximum_norm(n, X) - maximum_norm(n, X2)) << endl;
+}
+
+void zad3_gauss(int n, number ** A, number * X, number * X2){
+
+    //metoda eliminacji gaussa
+    gaussian_elimination(n, A);
+    
+    calculate_variables(n, A, X2);
+}
+
+void zad3_thomas(int n, number ** A2, number * X, number * X3){
+
+    //metoda przeganiania
+    number * B = new number[n]; 
+    B[0] = (- A2[0][1]) / A2[0][0];
+
+    number * Y = new number[n];
+    Y[0] = A2[0][n] / A2[0][0];
+
+    for(int i = 1; i < n; i++){ //B[n-1] nie jest mi potrzebne, ale Y[n-1] ma taka sama wartosc co X[n-1]
+        B[i] = (- A2[i][i+1])/(A2[i][i-1] * B[i-1] + A2[i][i]);
+        Y[i] = (A2[i][n] - (A2[i][i-1] * Y[i-1]))/(A2[i][i-1] * B[i-1] + A2[i][i]);
+    } 
+
+    X3[n-1] = Y[n-1];
+
+    for(int i = n - 2; i >= 0; i--){
+        X3[i] = B[i] * X3[i+1] + Y[i];
+    }
+}
+
+void time_printer(long int time_start, long int time_end){
+    cout << "czas trwania metody: " << ((double)(time_end - time_start))/CLOCKS_PER_SEC << endl;
+}
+
+void zad3(){
+
+    int n;
+    cout << "wpisz rozmiar macierzy" << endl;
+    cin >> n;
+
+    //alokacja macierzy
+    number ** A = new number * [n];
+    number ** A2 = new number * [n];
+    for(int i = 0; i < n; i++){
+        A[i] = new number[n + 1];
+        A2[i] = new number[n + 1];
+    }
+
+    //wypelnienie macierzy
+    A[0][0] = -6; //-3 * 1 - 3
+    A[0][1] = 1; 
+    for(int i = 1; i < n-1; i++){
+        
+        A[i][i-1] = 3 / ((number) (i + 1));
+        A[i][i] = (-3) * ((number) (i + 1)) - 3;
+        A[i][i+1] = (number) i + 1;
+
+    }
+    A[n-1][n-2] = 3 / ((number) n);
+    A[n-1][n-1] = (-3) * ((number) n) - 3;
+
+    //utworzenie wektora niewiadomych
+    number * X = new number[n];
+    number * X2 = new number[n];
+    number * X3 = new number[n];
+
     srand(time(NULL));
     for(int i = 0; i < n; i++){
         if(rand() % 2)
@@ -166,88 +333,60 @@ void old_labs(){
             X[i] = -1;
     }
 
-    cout << "\nwektor niewiadomych" <<endl;
-    print_vector(n, X);
+    // cout << "\nwektor niewiadomych - x" <<endl;
+    // print_vector(n, X);
 
-    number * B = new number[n];
-    multiply(n, A, X, B);
-
-    cout << "\nwektor prawej strony" << endl;
-    print_vector(n, B);
-
+    //wyliczenie wektora prawej strony - b
+    number * b = new number[n];
+    multiply(n, A, X, b);
     for(int i = 0; i < n; i++){
-        A[i][n] = B[i];
+        A[i][n] = b[i];
     }
 
-    cout << "\nmacierz" << endl;
-    print_matrix(n, A);
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n + 1; j++)
+            A2[i][j] = A[i][j];
 
-    gaussian_elimination(n, A);
-    cout << "\nmacierz po eliminacji" << endl;
-    print_matrix(n, A);
+    long int time_start, time_end;
 
-    number * X2 = new number[n];
-    calculate_variables(n, A, X2);
+    time_start = clock();
+    zad3_gauss(n, A, X, X2);
+    time_end = clock();
 
-    cout << "\nwyliczony wektor niewiadomych" << endl;
-    print_vector(n, X2);
+    cout << "\n\nEliminacja Gaussa:" << endl;
+    time_printer(time_start, time_end);
 
-    
-    // B = new number[n];
-    // multiply(n, A, X2, B);
-    // cout<<"\nwektor prawej strony na podstawie nowego wektora niewiadomych"<<endl;
-    // print_vector(n, B);
+    cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
+    cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X2) <<endl;
+    cout << "roznica norm euklidesowych " << absolute(euclidean_norm(n, X) - euclidean_norm(n, X2)) << endl;
 
- 
-    cout << "\nnorma euk X " << euclidean_norm(n, X) << "\nnorma euk X2 " << euclidean_norm(n, X2) <<endl;
+    cout << "\nnorma maksimum wektora zadanego " << maximum_norm(n, X) << endl;
+    cout << "norma maksimum wektora obliczonego " << maximum_norm(n, X2) <<endl;
+    cout << "roznica norm maksimum " << absolute(maximum_norm(n, X) - maximum_norm(n, X2)) << endl;
+
+    time_start = clock();
+    zad3_thomas(n, A2, X, X3);
+    time_end = clock();
+
+    cout << "\n\nAlgorytm Thomasa:" << endl;
+    time_printer(time_start, time_end);
+
+    cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
+    cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X3) <<endl;
+    cout << "roznica norm euklidesowych " << absolute(euclidean_norm(n, X) - euclidean_norm(n, X3)) << endl;
+
+    cout << "\nnorma maksimum wektora zadanego " << maximum_norm(n, X) << endl;
+    cout << "norma maksimum wektora obliczonego " << maximum_norm(n, X3) <<endl;
+    cout << "roznica norm maksimum " << absolute(maximum_norm(n, X) - maximum_norm(n, X3)) << endl;
+
 }
 
 int main(){
 
-    // old_labs(); exit(0);
+    // zad1();
+    // zad2();
+    zad3();
 
-    number **A; //rozszerzona macierz ukladu
-    int n;
-
-    cout << "wpisz liczbe niewiadomych" << endl;
-    cin >> n;
-
-    A = new number * [n];
-    for(int i = 0; i < n; i++)
-        A[i] = new number[n + 1];
-
-    cout << "podaj macierz rozszerzona rownania" << endl;
-    for(int i = 0; i < n; i++)
-        for(int j = 0; j <= n; j++)
-            cin >> A[i][j];
-
-    cout << "\nmacierz rozszerzona ukladu" << endl;
-    print_matrix(n, A);
-
-    gaussian_elimination(n, A);
-
-    number * X = new number[n]; //wektor niewiadomych
-
-    calculate_variables(n, A, X);
-    cout << "\nmacierz rozszerzona ukladu po eliminacji gaussa" << endl;
-    print_matrix(n, A);
-    cout << "\nwektor niewiadomych wyliczony na podstawie schodkowej powyzszej macierzy" << endl;
-    print_vector(n, X);
-
-    number * B = new number[n]; //wektor prawej strony wyliczony na podstawie wyliczonego wektora niewiadomych
-    multiply(n, A, X, B);
-    cout << "\nwektor prawej strony wyliczony na podstawie wektora niewiadomych" << endl;
-    print_vector(n, B);
-
-    number * Diff = new number[n]; //wektor roznic, miedzy wyliczonym, a wejsciowym wetorem prawej strony
-    count_differences(n, A, B, Diff);
-    cout << "\nroznice miedzy wejsciowym, a wyliczonym na podstawie wektore niewiadomych wektorem prawej strony" << endl;
-    print_vector(n, Diff);
-
-    number enorm = euclidean_norm(n, X);
-    number mnorm = maximum_norm(n, X);
-
-    cout<<"\nnorma euklidesowa wektora niewiadomych - "<<enorm<<"\nnorma maksimum wektora niewiadomych - "<<mnorm<<endl;
 }
 
 
