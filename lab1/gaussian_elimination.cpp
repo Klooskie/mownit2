@@ -8,6 +8,10 @@
 using namespace std;
 typedef float number;
 
+number absolute(number x){
+    return x < 0 ? (-1) * x : x;
+}
+
 void print_vector(int n, number * A){
     for(int i = 0; i < n; i++){
         cout << A[i] << endl;
@@ -23,14 +27,13 @@ void print_matrix(int n, number ** A){
     }
 }
 
-number absolute(number x){
-    return x < 0 ? (-1) * x : x;
-}
-
 void fill_vector_X(int n, number * X){
     srand(time(NULL));
     for(int i = 0; i < n; i++){
-        X[i] = rand() % 2;
+        if(rand() % 2)
+            X[i] = 1;
+        else
+            X[i] = -1;
     }
 }
 
@@ -132,7 +135,9 @@ number maximum_norm(int n, number * X){
     return max_number;
 }
 
-void print_vector_norms(int n, number * X, number * X2){
+void print_vector_and_norms(int n, number * X, number * X2){
+    
+    print_vector(n, X2);
 
     cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
     cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X2) <<endl;
@@ -141,6 +146,41 @@ void print_vector_norms(int n, number * X, number * X2){
     cout << "\nnorma maksimum wektora zadanego " << maximum_norm(n, X) << endl;
     cout << "norma maksimum wektora obliczonego " << maximum_norm(n, X2) <<endl;
     cout << "roznica norm maksimum " << absolute(maximum_norm(n, X) - maximum_norm(n, X2)) << endl;
+
+}
+
+void experiment(int n, number ** A){
+    //stworzenie i wypelnienie wektora niewiadomych
+    number * X = new number[n];
+    fill_vector_X(n, X);
+
+    cout << "\nwektor niewiadomych - x" <<endl;
+    print_vector(n, X);
+
+    //wyliczenie wektora prawej strony
+    number * B = new number[n];
+    multiply(n, A, X, B);
+    for(int i = 0; i < n; i++){
+        A[i][n] = B[i];
+    }
+
+    // cout << "\nwektor prawej strony - b" << endl;
+    // print_vector(n, B);
+
+    // cout << "\nmacierz" << endl;
+    // print_matrix(n, A);
+
+    gaussian_elimination(n, A);
+
+    // cout << "\nmacierz po eliminacji" << endl;
+    // print_matrix(n, A);
+
+    number * X2 = new number[n];
+    calculate_variables(n, A, X2);
+
+    cout << "\nwyliczony wektor niewiadomych" << endl;
+    
+    print_vector_and_norms(n, X, X2);
 
 }
 
@@ -163,37 +203,7 @@ void zad1(int n){
         }
     }
 
-    //stworzenie i wypelnienie wektora niewiadomych
-    number * X = new number[n];
-    fill_vector_X(n, X);
-
-    cout << "\nwektor niewiadomych - x" <<endl;
-    print_vector(n, X);
-
-    number * B = new number[n];
-    multiply(n, A, X, B);
-
-    cout << "\nwektor prawej strony - b" << endl;
-    print_vector(n, B);
-
-    for(int i = 0; i < n; i++){
-        A[i][n] = B[i];
-    }
-
-    // cout << "\nmacierz" << endl;
-    // print_matrix(n, A);
-
-    gaussian_elimination(n, A);
-    // cout << "\nmacierz po eliminacji" << endl;
-    // print_matrix(n, A);
-
-    number * X2 = new number[n];
-    calculate_variables(n, A, X2);
-
-    cout << "\nwyliczony wektor niewiadomych" << endl;
-    print_vector(n, X2);
-
-    print_vector_norms(n, X, X2);
+    experiment(n, A);
 }
 
 void zad2(int n){
@@ -215,37 +225,7 @@ void zad2(int n){
         }
     }
 
-    //stworzenie i wypelnienie wektora niewiadomych
-    number * X = new number[n];
-    fill_vector_X(n, X);
-
-    cout << "\nwektor niewiadomych - x" <<endl;
-    print_vector(n, X);
-
-    number * B = new number[n];
-    multiply(n, A, X, B);
-
-    cout << "\nwektor prawej strony - b" << endl;
-    print_vector(n, B);
-
-    for(int i = 0; i < n; i++){
-        A[i][n] = B[i];
-    }
-
-    // cout << "\nmacierz" << endl;
-    // print_matrix(n, A);
-
-    gaussian_elimination(n, A);
-    // cout << "\nmacierz po eliminacji" << endl;
-    // print_matrix(n, A);
-
-    number * X2 = new number[n];
-    calculate_variables(n, A, X2);
-
-    cout << "\nwyliczony wektor niewiadomych" << endl;
-    print_vector(n, X2);
-    
-    print_vector_norms(n, X, X2);
+    experiment(n, A);
 }
 
 void print_time_and_norms(struct timeval time_start, struct timeval time_end, int n, number * X, number * X2){
@@ -293,7 +273,7 @@ void zad3_gauss(int n, number * X){
         A[i][n] = B[i];
     }
 
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! wypisanie macierzy
+    // wypisanie macierzy
     // print_matrix(n, A);
 
     //zapamietanie czasu poczatkowego
@@ -346,7 +326,7 @@ void zad3_thomas(int n, number * X){
     A[0][3] = A[0][1] * X[0] + A[0][2] * X[1];
     A[n-1][3] = A[n-1][0] * X[n-2] + A[n-1][1] * X[n-1];
 
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! wypisanie macierzy
+    // wypisanie macierzy
     // for(int i = 0; i < n; i++){
     //     cout << A[i][0] << "\t" << A[i][1] << "\t" << A[i][2] << "\t->\t" << A[i][3] << endl;
     // }
