@@ -68,66 +68,114 @@ number maximum_norm(int n, number * X){
 }
 
 number * jacobi_method(int n, number ** A, int number_of_iterations){
-    //alokacja macierzy niewiadomych X
+    //alokacja i wypelnienie poczatkowego wektora niewiadomych X
     number * X = new number[n];
-    
-    //wypelnienie poczatkowego wektora niewiadomych X
-    for(int i = 0; i < n; i++){
+    for(int i = 0; i < n; i++)
         X[i] = 0;
-    }
 
-    //odwrocenie wartosci na przekatnej macierzy
+    //odwrocenie wartosci na przekatnej macierzy - traktujemy wtedy te przekatna jako N = D ^ (-1)
     for(int i = 0; i < n; i++){
         A[i][i] = 1 / A[i][i];
     }
 
-    //obliczenie wartości N*b, gdzie b to wektor prawej strony, a N to macierz A z wyzerowanymi wartosciami poza glowna przekatna
+    //obliczenie wartości N*b, gdzie b to wektor prawej strony
     number * Nb = new number[n];
     for(int i = 0; i < n; i++){
         Nb[i] = A[i][i] * A[i][n];
     }
 
-    //obliczenie wartosci M
+    //obliczenie macierzy M = -N * (L + U)
     number ** M = new number * [n];
     for(int i = 0; i < n; i++){
-        M[i] = new number[n+1];
-        for(int j = 0; j < n; j++){
-            
-            M[i][j] = 0;
+        M[i] = new number[n];
 
-            if(i != j) {
+        for(int j = 0; j < n; j++){
+
+            M[i][j] = 0;
+            if(i != j) 
                 M[i][j] -= A[i][i] * A[i][j];
-            }
         }
     }
-
-    print_matrix(n, M);
 
     //wykonanie number_of_iterations iteracji przyblizania wektora X
     for(int iteration = 0; iteration < number_of_iterations; iteration++){
 
         number * newX = new number[n];
         for(int i = 0; i < n; i++){
-
             newX[i] = Nb[i];
             for(int j = 0; j < n; j++){
                 newX[i] += (M[i][j] * X[j]);
             }
-
         }
 
         for(int i = 0; i < n; i++){
             X[i] = newX[i];
         }
 
-        cout<<endl;
-        print_vector(n, X);        
+        // cout<<endl;
+        // print_vector(n, X);        
     }
-
 
     return X;
 }
 
+
+
+//eksperyment jak na 1 labach
+
+void multiply(int n, number ** A, number * X, number * B){
+    for(int i = 0; i < n; i++){
+        B[i] = 0;
+        for(int j = 0; j < n; j++){
+            B[i] += A[i][j] * X[j];
+        }
+    }
+}
+
+void print_vector_and_norms(int n, number * X, number * X2){
+    
+    print_vector(n, X2);
+
+    cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
+    cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X2) <<endl;
+    cout << "roznica norm euklidesowych " << absolute(euclidean_norm(n, X) - euclidean_norm(n, X2)) << endl;
+
+    cout << "\nnorma maksimum wektora zadanego " << maximum_norm(n, X) << endl;
+    cout << "norma maksimum wektora obliczonego " << maximum_norm(n, X2) <<endl;
+    cout << "roznica norm maksimum " << absolute(maximum_norm(n, X) - maximum_norm(n, X2)) << endl;
+
+}
+
+void experiment(int n, number ** A, int number_of_iterations){
+    //stworzenie i wypelnienie wektora niewiadomych
+    number * X = new number[n];
+    fill_vector_X(n, X);
+
+    cout << "\nwektor niewiadomych - x" <<endl;
+    print_vector(n, X);
+
+    //wyliczenie wektora prawej strony
+    number * B = new number[n];
+    multiply(n, A, X, B);
+    for(int i = 0; i < n; i++){
+        A[i][n] = B[i];
+    }
+
+    cout << "\nwektor prawej strony - b" << endl;
+    print_vector(n, B);
+
+    cout << "\nmacierz" << endl;
+    print_matrix(n, A);
+
+    number * X2 = new number[n];
+    X2 = jacobi_method(n, A, number_of_iterations);
+
+    cout << "\nwyliczony wektor niewiadomych" << endl;    
+    print_vector_and_norms(n, X, X2);
+
+}
+
+//koniec eksperymentu
 
 /*
 void gaussian_elimination(int n, number ** A){
@@ -191,21 +239,10 @@ void calculate_variables(int n, number ** A, number * X){
     }
 }
 
-void multiply(int n, number ** A, number * X, number * B){
-    for(int i = 0; i < n; i++){
-        B[i] = 0;
-        for(int j = 0; j < n; j++){
-            B[i] += A[i][j] * X[j];
-        }
-    }
-}
 */
 
-int main(){
-    int n, number_of_iterations;
-    cout << "wpisz rozmiar macierzy i liczbe iteracji" << endl;
-    cin >> n >> number_of_iterations;
-
+void zad1(int n, int number_of_iterations){
+    
     number ** A = new number * [n];
     for(int i = 0; i < n; i++){
         A[i] = new number[n+1];
@@ -218,6 +255,14 @@ int main(){
         }
     }
 
-    jacobi_method(n, A, number_of_iterations);
+    experiment(n, A, number_of_iterations);
+}
+
+int main(){
+    int n, number_of_iterations;
+    cout << "wpisz rozmiar macierzy i liczbe iteracji" << endl;
+    cin >> n >> number_of_iterations;
+
+    zad1(n, number_of_iterations);
 
 }
