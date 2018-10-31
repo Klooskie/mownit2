@@ -137,6 +137,7 @@ number maximum_norm(int n, number * X){
 
 void print_vector_and_norms(int n, number * X, number * X2){
     
+    cout << "\nwyliczony wektor niewiadomych" << endl;
     print_vector(n, X2);
 
     cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
@@ -177,8 +178,6 @@ void experiment(int n, number ** A){
 
     number * X2 = new number[n];
     calculate_variables(n, A, X2);
-
-    cout << "\nwyliczony wektor niewiadomych" << endl;
     
     print_vector_and_norms(n, X, X2);
 
