@@ -1,0 +1,1 @@
+wystarczy uzyc makefile'a poleceniem make, ewentualnie skompilowac uzywajac g++ bez zadnych dodatkowych opcji
