@@ -75,6 +75,15 @@ number maximum_norm(int n, number * X){
     return max_number;
 }
 
+void multiply(int n, number ** A, number * X, number * B){
+    for(int i = 0; i < n; i++){
+        B[i] = 0;
+        for(int j = 0; j < n; j++){
+            B[i] += A[i][j] * X[j];
+        }
+    }
+}
+
 void print_vector_and_norms(int n, number * X, number * X2){
     
     // cout << "\nwyliczony wektor niewiadomych" << endl;    
@@ -87,139 +96,6 @@ void print_vector_and_norms(int n, number * X, number * X2){
     cout << "\nnorma maksimum wektora zadanego " << maximum_norm(n, X) << endl;
     cout << "norma maksimum wektora obliczonego " << maximum_norm(n, X2) <<endl;
     cout << "norma maksimum roznicy wektorow zadanego i obliczonego " << maximum_norm(n, subtract_vectors(n, X, X2)) << endl;
-
-}
-
-void multiply(int n, number ** A, number * X, number * B){
-    for(int i = 0; i < n; i++){
-        B[i] = 0;
-        for(int j = 0; j < n; j++){
-            B[i] += A[i][j] * X[j];
-        }
-    }
-}
-
-bool stopping_rule_1(int n, number * X, number * newX, number ro){
-
-    number * X_diff = new number[n];
-
-    for(int i = 0; i < n; i++){
-        X_diff[i] = newX[i] - X[i];
-    }
-
-    // cout << "roznica miedzy wektorem z kolejnej iteracji, a aktualnym ";
-    // cout << maximum_norm(n, X_diff) << endl;
-
-    if(maximum_norm(n, X_diff) < ro)
-        return true;
-    else
-        return false;
-}
-
-bool stopping_rule_2(int n, number * X_new, number ** A, number ro){
-
-    number * B = new number[n];
-    number * B_diff = new number[n];
-
-    multiply(n, A, X_new, B);    
-
-    for(int i = 0; i < n; i++){
-        B_diff[i] = B[i] - A[i][n];
-    }
-
-    // cout << "roznica miedzy wektorem prawej strony wyliczonym z aktualnego wektora niewiadomych, a zadanym ";
-    // cout << maximum_norm(n, B_diff) << endl;
-
-    if(maximum_norm(n, B_diff) < ro)
-        return true;
-    else
-        return false;
-}
-
-number * jacobi_method(int n, number ** A, number ro, int stopping_rule_number){
-    //alokacja i wypelnienie poczatkowego wektora niewiadomych X
-    number * X = new number[n];
-    for(int i = 0; i < n; i++)
-        X[i] = 0;
-
-    //obliczenie wartości N*b, gdzie b to wektor prawej strony, 
-    //a N = D ^ (-1) to macierz powstala przez odwrocenie macierzy skladajacej sie z zer i przekatnej macierzy A
-    number * Nb = new number[n];
-    for(int i = 0; i < n; i++){
-        Nb[i] = (1 / A[i][i]) * A[i][n];
-    }
-
-    //obliczenie macierzy iteracji M = -N * (L + U)
-    number ** M = new number * [n];
-    for(int i = 0; i < n; i++){
-        M[i] = new number[n];
-        for(int j = 0; j < n; j++){
-            M[i][j] = 0;
-            if(i != j) 
-                M[i][j] -= (1 / A[i][i]) * A[i][j];
-        }
-    }
-
-    // cout<<"\nmacierz iteracji"<<endl;
-    // print_matrix(n, M);
-    
-    //alokacja nowego wektora X i zmiennej przechowujacej liczbe iteracji
-    number * X_new = new number[n];
-    int number_of_iterations = 0;
-
-    //wykonywanie iteracji dopoki nie zajdzie warunek stopu
-    while(true){
-        //sleep(1);
-
-        //obliczenie nowego wektora X
-        for(int i = 0; i < n; i++){
-            X_new[i] = Nb[i];
-            for(int j = 0; j < n; j++){
-                X_new[i] += (M[i][j] * X[j]);
-            }
-        }
-
-        //sprawdzenie pierwszego warunku stopu
-        if(stopping_rule_number == 1 && stopping_rule_1(n, X, X_new, ro))
-            break;
-
-        //sprawdzenie drugiego warunku stopu
-        if(stopping_rule_number == 2 && stopping_rule_2(n, X, A, ro))
-            break;
-
-        number_of_iterations++;
-
-        for(int i = 0; i < n; i++){
-            X[i] = X_new[i];
-        }    
-    }
-
-    cout << "\nliczba iteracji " << number_of_iterations << endl;
-    return X;
-}
-
-void experiment(int n, number ** A, number ro, int stopping_rule_number){
-    //stworzenie i wypelnienie wektora niewiadomych
-    number * X = new number[n];
-    fill_vector_X(n, X);
-
-    // cout << "\nwektor niewiadomych - x" <<endl;
-    // print_vector(n, X);
-
-    //wyliczenie wektora prawej strony
-    number * B = new number[n];
-    multiply(n, A, X, B);
-    for(int i = 0; i < n; i++){
-        A[i][n] = B[i];
-    }
-
-    // cout << "\nmacierz" << endl;
-    // print_augmented_matrix(n, A);
-
-    number * X2;
-    X2 = jacobi_method(n, A, ro, stopping_rule_number);
-
-    print_vector_and_norms(n, X, X2);
 
 }
 
@@ -251,11 +127,97 @@ void fill_A_matrix(int n, number ** A){
     }
 }
 
-void zad1(int n, number ro){
+bool stopping_rule_1(int n, number * X, number * newX, number ro){
 
-    int stopping_rule_number;
-    cout << "wpisz number warunku stopu, ktorego chcesz uzyc?" << endl;
-    cin >> stopping_rule_number;
+    number * X_diff = new number[n];
+
+    for(int i = 0; i < n; i++){
+        X_diff[i] = newX[i] - X[i];
+    }
+
+    // cout << "roznica miedzy wektorem niewiadomych z kolejnej iteracji, a aktualnym ";
+    // cout << maximum_norm(n, X_diff) << endl;
+
+    if(maximum_norm(n, X_diff) < ro)
+        return true;
+    else
+        return false;
+}
+
+bool stopping_rule_2(int n, number * X_new, number ** A, number ro){
+
+    number * B = new number[n];
+    number * B_diff = new number[n];
+
+    multiply(n, A, X_new, B);    
+
+    for(int i = 0; i < n; i++){
+        B_diff[i] = B[i] - A[i][n];
+    }
+
+    // cout << "roznica miedzy wektorem prawej strony wyliczonym z aktualnego wektora niewiadomych, a zadanym ";
+    // cout << maximum_norm(n, B_diff) << endl;
+
+    if(maximum_norm(n, B_diff) < ro)
+        return true;
+    else
+        return false;
+}
+
+number * SOR(int n, number ** A, number omega, number ro, int stopping_rule_number){
+
+    //alokacja i wypelnienie poczatkowego wektora niewiadomych X
+    number * X = new number[n];
+    for(int i = 0; i < n; i++)
+        X[i] = 0;
+
+    //alokacja nowego wektora X i zmiennej przechowujacej liczbe iteracji
+    number * X_new = new number[n];
+    int number_of_iterations = 0;
+
+    while(true){
+        //sleep(1);
+
+        for(int i = 0; i < n; i++){
+            
+            X_new[i] = (1 - omega) * X[i];
+            X_new[i] += (omega / A[i][i]) * A[i][n];
+            for(int j = 0; j < i; j++)
+                X_new[i] -= (omega / A[i][i]) * A[i][j] * X_new[j];
+            for(int j = i + 1; j < n; j++)
+                X_new[i] -= (omega / A[i][i]) * A[i][j] * X[j];
+
+        }
+
+        // cout << "\nnajnowszy wektor niewiadomych" << endl;
+        // print_vector(n, X_new);
+
+        //sprawdzenie pierwszego warunku stopu
+        if(stopping_rule_number == 1 && stopping_rule_1(n, X, X_new, ro))
+            break;
+
+        //sprawdzenie drugiego warunku stopu
+        if(stopping_rule_number == 2 && stopping_rule_2(n, X, A, ro))
+            break;
+
+        number_of_iterations++;
+
+
+        for(int i = 0; i < n; i++){
+            X[i] = X_new[i];
+        }    
+    }
+    
+    cout << "\nliczba iteracji " << number_of_iterations << endl;
+
+    return X;
+}
+
+int main(){
+    int n, stopping_rule_number;
+    number ro, omega;
+    cout << "wpisz rozmiar macierzy, ro z warunku stopu, omege z przedzialu (1, 2) i numer warunku stopu do wykorzystania" << endl;
+    cin >> n >> ro >> omega >> stopping_rule_number;
     while(stopping_rule_number != 1 && stopping_rule_number != 2){
         cout << "podaj numer warunku stopu - 1 lub 2" << endl;
         cin >> stopping_rule_number;
@@ -267,77 +229,26 @@ void zad1(int n, number ro){
 
     fill_A_matrix(n, A);
 
-    experiment(n, A, ro, stopping_rule_number);
-}
+    //stworzenie i wypelnienie wektora niewiadomych
+    number * X = new number[n];
+    fill_vector_X(n, X);
 
-void zad2(int n, number ro){
+    // cout << "\nwektor niewiadomych - x" <<endl;
+    // print_vector(n, X);
 
-    number ** A = new number * [n];
-    for(int i = 0; i < n; i++)
-        A[i] = new number[n+1];
-
-    fill_A_matrix(n, A);
-
-    // cout<<"\nmacierz A\n";
-    // print_matrix(n, A);
-
-    //obliczenie macierzy iteracji M = -N * (L + U)
-    number ** M = new number * [n];
+    //wyliczenie wektora prawej strony
+    number * B = new number[n];
+    multiply(n, A, X, B);
     for(int i = 0; i < n; i++){
-        M[i] = new number[n];
-        for(int j = 0; j < n; j++){
-            M[i][j] = 0;
-            if(i != j) 
-                M[i][j] -= (1 / A[i][i]) * A[i][j];
-        }
+        A[i][n] = B[i];
     }
 
-    // cout<<"\nmacierz iteracji\n";
-    // print_matrix(n, M);
+    // cout << "\nmacierz" << endl;
+    // print_augmented_matrix(n, A);
 
-    int number_of_iterations = 0;
-    number norm;
-    number * x = new number[n];
-    number * x_new = new number[n];
-    for(int i = 0; i < n; i++)
-        x[i] = ((number) (rand() % 1000)) / 1000;
+    number * X2;
+    X2 = SOR(n, A, omega, ro, stopping_rule_number);
 
-    while(true){
-        // sleep(1);
-
-        number_of_iterations++;
-
-        //wyliczenie kolejnego wektora x_new
-        multiply(n, M, x, x_new);
-
-        //normalizacja wektora x_new
-        norm = maximum_norm(n, x_new);
-        for(int i = 0; i < n; i++){
-            x_new[i] = x_new[i] / norm;
-        }
-
-        // cout << "\naktualny wyliczony wektor wlasny zwiazany z najwieksza wartoscia wlasna" << endl;
-        // print_vector(n, x_new);
-        // cout << "aktualna norma maksimum wektora wlasnego zwiazanego z najwieksza wartoscia wlasna " << norm << endl;
-
-        if(stopping_rule_1(n, x, x_new, ro))
-            break;
-
-        for(int i = 0; i < n; i++)
-            x[i] = x_new[i];
-    }
-
-    cout << "liczba iteracji " << number_of_iterations << endl;
-    cout << "najwieksza wartosc wlasna macierzy iteracji - promien spektralny wynosi " << norm << endl;
-}
-
-int main(){
-    int n;
-    number ro;
-    cout << "wpisz rozmiar macierzy i ro z warunku stopu" << endl;
-    cin >> n >> ro;
-
-    zad1(n, ro);
-    zad2(n, ro);
+    print_vector_and_norms(n, X, X2);
 
 }
