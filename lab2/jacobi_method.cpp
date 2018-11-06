@@ -254,7 +254,7 @@ void fill_A_matrix(int n, number ** A){
 void zad1(int n, number ro){
 
     int stopping_rule_number;
-    cout << "wpisz number warunku stopu, ktorego chcesz uzyc?" << endl;
+    cout << "wpisz number warunku stopu, ktorego chcesz uzyc" << endl;
     cin >> stopping_rule_number;
     while(stopping_rule_number != 1 && stopping_rule_number != 2){
         cout << "podaj numer warunku stopu - 1 lub 2" << endl;
@@ -338,6 +338,7 @@ int main(){
     cin >> n >> ro;
 
     zad1(n, ro);
+    cout << endl;
     zad2(n, ro);
 
 }
