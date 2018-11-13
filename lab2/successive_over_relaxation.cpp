@@ -216,7 +216,7 @@ number * SOR(int n, number ** A, number omega, number ro, int stopping_rule_numb
 int main(){
     int n, stopping_rule_number;
     number ro, omega;
-    cout << "wpisz rozmiar macierzy, ro z warunku stopu, omege z przedzialu (1, 2) i numer warunku stopu do wykorzystania" << endl;
+    cout << "wpisz rozmiar macierzy, ro z warunku stopu, omege z przedzialu [1, 2) i numer warunku stopu do wykorzystania" << endl;
     cin >> n >> ro >> omega >> stopping_rule_number;
     while(stopping_rule_number != 1 && stopping_rule_number != 2){
         cout << "podaj numer warunku stopu - 1 lub 2" << endl;
