@@ -86,7 +86,7 @@ void secant_method(number a, number b, number start1, number start2, number ro, 
         return;
     }
 
-    cout << "liczba iteracji " << number_of_iterations << "   miejsce zerowe " << x3 << "   delta " << proper_zero_of_f - x3 << endl;
+    cout << "liczba iteracji " << number_of_iterations << "   miejsce zerowe " << x3 << "   delta " << absolute(proper_zero_of_f - x3) << endl;
 
 }
 
@@ -123,7 +123,7 @@ void newtons_method(number a, number b, number start1, number ro, int stopping_r
         return;
     }
 
-    cout << "liczba iteracji " << number_of_iterations << "   miejsce zerowe " << x1 << "   delta " << proper_zero_of_f - x1 << endl;
+    cout << "liczba iteracji " << number_of_iterations << "   miejsce zerowe " << x1 << "   delta " << absolute(proper_zero_of_f - x1) << endl;
 
 }
 
