@@ -86,7 +86,7 @@ number maximum_norm(number * x){
     return max_number;
 }
 
-number * podstaw_niewiadome(number * x){
+number * F(number * x){
     number * result = new number [3];
     result[0] = f1_fun(x[0], x[1], x[2]);
     result[1] = f2_fun(x[0], x[1], x[2]);
@@ -126,9 +126,9 @@ number * find_matching_proper_solution(number * x){
 
 number * calculate_d(number * x){
     
-    number * minus_f_podstawione = podstaw_niewiadome(x);
+    number * minus_F = F(x);
     for(int i = 0; i < 3; i++)
-        minus_f_podstawione[i] *= -1;
+        minus_F[i] *= -1;
 
     number ** jacobian = new number * [3];
     number ** inverse_jacobian = new number * [3];
@@ -172,7 +172,7 @@ number * calculate_d(number * x){
     inverse_jacobian[2][1] = inverse_determinant * (jacobian[0][1] * jacobian[2][0] - jacobian[0][0] * jacobian[2][1]);
     inverse_jacobian[2][2] = inverse_determinant * (jacobian[0][0] * jacobian[1][1] - jacobian[0][1] * jacobian[1][0]);
 
-    return multiply_matrix_and_vector(inverse_jacobian, minus_f_podstawione);
+    return multiply_matrix_and_vector(inverse_jacobian, minus_F);
 
 }
 
@@ -183,23 +183,23 @@ bool stopping_rule_1(number * x1, number * x2, number ro){
 }
 
 bool stopping_rule_2(number * x, number ro){
-    if(maximum_norm(podstaw_niewiadome(x)) < ro)
+    if(maximum_norm(F(x)) < ro)
         return true;
     return false;
 }
 
 void newtons_method(number * start, number ro, int stopping_rule_number){
     
-    number * x1 = start; 
+    number * x1 = new number [3]; 
     number * x2 = new number [3];
     number * d;
 
-    int number_of_iterations = 0, max_iters = 10000;
+    for(int i = 0; i < 3; i++)
+        x1[i] = start[i];
+
+    int number_of_iterations = 0, max_iters = 1000000;
 
     while(number_of_iterations < max_iters){
-        
-        // cout<<"x1"<<endl;
-        // print_vector(x1);
 
         d = calculate_d(x1);
 
@@ -226,26 +226,28 @@ void newtons_method(number * start, number ro, int stopping_rule_number){
 
     cout << "liczba iteracji " << number_of_iterations << endl;
     cout << "wyliczony wektor:" << endl;
-    cout << "x1 = " << x1[0] << endl;
-    cout << "x2 = " << x1[1] << endl;
-    cout << "x3 = " << x1[2] << endl;
+    cout << "[" << x1[0] << ", " << x1[1] << ", " << x1[2] << "]" << endl;
 
-    cout << "\nnajblizszy wyliczonemu wektor bedacy rozwiazaniem ukladu" << endl;
     number * proper_solution = find_matching_proper_solution(x1);
-    print_vector(proper_solution);
-
     cout << "delta " << maximum_norm(subtract_vectors(x1, proper_solution)) << endl;
 }
 
 int main(){
 
     number * start = new number [3];
-    for(int i = 0; i < 3; i++)
-        start[i] = 1337;
 
-    number ro = 0.000001;
-    int stopping_rule_number = 2;
+    start[0] = 1;
+    start[1] = 0;
+    start[2] = 0;
 
-    newtons_method(start, ro, stopping_rule_number);
+    for(int stopping_rule_number = 1; stopping_rule_number <= 2; stopping_rule_number++){
+
+        cout << "\n\n\nwarunek stopu " << stopping_rule_number << endl;
+
+        for(number ro = 0.0001; ro >= 0.0000000001; ro *= 0.000001){
+            cout << "\nro: " << ro << endl;
+            newtons_method(start, ro, stopping_rule_number);
+        }
+    }
 
 }
