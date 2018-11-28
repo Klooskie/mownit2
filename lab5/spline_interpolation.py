@@ -12,6 +12,42 @@ def maximum_norm(vector):
     return m
 
 
+def calculate_factors_cubic(n, points):
+    h = []
+    b = []
+    u = []
+    v = []
+    z = []
+    for i in range(n - 1):
+        h.append(points[i + 1][0] - points[i][0])
+        b.append((points[i + 1][1] - points[i][1]) / h[i])
+
+    u.append(0)
+    v.append(0)
+    u.append(2 * (h[0] + h[1]))
+    v.append(6 * (b[1] - b[0]))
+
+    for i in range(2, n - 1):
+        u_value = 2 * (h[i] - h[i - 1])
+        u_value -= h[i - 1] * h[i - 1] / u[i - 1]
+        u.append(u_value)
+
+        v_value = 6 * (b[i] - b[i - 1])
+        v_value -= h[i - 1] * v[i - 1] / u[i - 1]
+        v.append(v_value)
+
+    # miejsce na warunki brzegowe !!!
+    z.append(0)
+    for i in range(n - 2, 0, -1):
+        z_value = v[i] - h[i] * z[-1]
+        z_value /= u[i]
+        z.append(z_value)
+    z.append(0)
+    z.reverse()
+
+    return z
+
+
 def cubic_spline(x, n, points, factors):
     i = 0
     while x > points[i + 1][0]:
@@ -20,6 +56,18 @@ def cubic_spline(x, n, points, factors):
         else:
             break
 
+    h = points[i+1][0] - points[i][0]
+
+    result = (x - points[i][0]) * (factors[i+1] - factors[i])
+    result /= (6 * h)
+    result += factors[i] / 2
+
+    result *= (x - points[i][0])
+    result -= (h / 6) * (factors[i+1] + 2 * factors[i])
+    result += (points[i+1][1] - points[i][1]) / h
+
+    result *= (x - points[i][0])
+    result += points[i][1]
 
     return result
 
@@ -28,11 +76,9 @@ def cubic_spline_for_domain(domain, n, points, boundary_condition):
     result = []
     difference = []
 
-    z0 = choose_z0(boundary_condition, points)
-    factors = calculate_factors(n, points, z0)
-
+    factors = calculate_factors_cubic(n, points)
     for x in domain:
-        result.append(quadratic_spline(x, n, points, factors.copy()))
+        result.append(cubic_spline(x, n, points, factors))
         difference.append(f(x) - result[-1])
 
     print("norma maksimum roznicy funkcji sklejanej (drugiego stopnia) i funkcji f: " + str(maximum_norm(difference)))
@@ -48,7 +94,7 @@ def choose_z0(boundary_condition, points):
         return (points[1][1] - points[0][1]) / (points[1][0] - points[0][0])
 
 
-def calculate_factors(n, points, z0):
+def calculate_factors_quadratic(n, points, z0):
     factors = [z0]
     for i in range(n - 1):
         new_factor = 2 * (points[i + 1][1] - points[i][1])
@@ -80,10 +126,10 @@ def quadratic_spline_for_domain(domain, n, points, boundary_condition):
     difference = []
 
     z0 = choose_z0(boundary_condition, points)
-    factors = calculate_factors(n, points, z0)
+    factors = calculate_factors_quadratic(n, points, z0)
 
     for x in domain:
-        result.append(quadratic_spline(x, n, points, factors.copy()))
+        result.append(quadratic_spline(x, n, points, factors))
         difference.append(f(x) - result[-1])
 
     print("norma maksimum roznicy funkcji sklejanej (drugiego stopnia) i funkcji f: " + str(maximum_norm(difference)))
@@ -91,7 +137,8 @@ def quadratic_spline_for_domain(domain, n, points, boundary_condition):
 
 
 def f(x):
-    return sin(4 * x / pi) * exp(-0.2 * x / pi)
+    # return sin(4 * x / pi) * exp(-0.2 * x / pi)
+    return x ** 3
 
 
 def f_for_domain(domain):
@@ -102,7 +149,7 @@ def f_for_domain(domain):
 
 
 def main():
-    for n in range(2, 21):
+    for n in range(3, 21):
 
         a = -5
         b = 10
@@ -115,7 +162,7 @@ def main():
             x = a + i * step
             points.append((x, f(x)))
 
-        domain = np.linspace(a, b, num=1500)
+        domain = np.linspace(a-1, b+1, num=1500)
 
         print('\n\nWezly (' + str(n) + ') rozmieszczone rownomiernie na calym przedziale')
 
