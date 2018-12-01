@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 from math import sin, cos, pi, exp
 
 
@@ -10,55 +9,6 @@ def maximum_norm(vector):
         if abs(x) > m:
             m = abs(x)
     return m
-
-#
-# def newton_polynomial(x, n, factors, iksy):
-#     result = 0
-#     for i in range(n):
-#         result += factors[i]
-#         for j in range(i + 1, n):
-#             factors[j] *= (x - iksy[i])
-#     return result
-#
-#
-# def newton_polynomial_for_domain(domain, n, points):
-#     result = []
-#     difference = []
-#     iksy = []
-#     column_0 = []
-#     for p in points:
-#         iksy.append(p[0])
-#         column_0.append(p[1])
-#
-#     divided_differences_table = [column_0]
-#     column_1 = []
-#     for i in range(n - 1):
-#         value = divided_differences_table[0][i + 1]
-#         value -= divided_differences_table[0][i]
-#         value /= (iksy[i + 1] - iksy[i])
-#         column_1.append(value)
-#
-#     divided_differences_table.append(column_1)
-#
-#     for i in range(2, n):
-#         column = []
-#         for j in range(n - i):
-#             value = divided_differences_table[i - 1][j + 1]
-#             value -= divided_differences_table[i - 1][j]
-#             value /= (iksy[j + i] - iksy[j])
-#             column.append(value)
-#         divided_differences_table.append(column)
-#
-#     factors = []
-#     for column in divided_differences_table:
-#         factors.append(column[0])
-#
-#     for x in domain:
-#         result.append(newton_polynomial(x, n, factors.copy(), iksy))
-#         difference.append(f(x) - result[-1])
-#
-#     print("norma maksimum roznicy wielomianu i funkcji (hermite): " + str(maximum_norm(difference)))
-#     return result
 
 
 def hermite_polynomial(x, n, factors, new_points):
@@ -144,7 +94,9 @@ def f_for_domain(domain):
 
 
 def main():
-    for n in range(2, 21):
+    for n in range(2, 22):
+        if n == 21:
+            n = 30
 
         a = -5
         b = 10
@@ -161,8 +113,8 @@ def main():
         fig = plt.figure(1)
         fig.canvas.set_window_title('Wezly (' + str(n) + ') rozmieszczone rownomiernie na calym przedziale')
 
+        plt.grid(True)
         plt.plot(domain, hermite_polynomial_for_domain(domain, n, points), 'k-')
-        # plt.plot(domain, newton_polynomial_for_domain(domain, n, points), 'k-')
         plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
         plt.plot(domain, f_for_domain(domain), 'b--')
         plt.title('Wizualizacja interpolowanego wielomianu Hermite\'a')
@@ -176,11 +128,11 @@ def main():
         fig = plt.figure(2)
         fig.canvas.set_window_title('Wezly (' + str(n) + ') rozmieszczone zgodnie z zerami wielomianu Czebyszewa')
 
+        plt.grid(True)
         plt.plot(domain, hermite_polynomial_for_domain(domain, n, points), 'k-')
-        # plt.plot(domain, newton_polynomial_for_domain(domain, n, points), 'k-')
         plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
         plt.plot(domain, f_for_domain(domain), 'b--')
-        plt.title('Wizualizacja interpolowanego wielomianu Lagrange\'a')
+        plt.title('Wizualizacja interpolowanego wielomianu Hermite\'a')
 
         plt.show()
 

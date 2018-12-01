@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 from math import sin, cos, pi, exp
 
 
@@ -10,6 +9,45 @@ def maximum_norm(vector):
         if abs(x) > m:
             m = abs(x)
     return m
+
+
+def newton_polynomial(x, n, factors, points):
+    result = 0
+    for i in range(n):
+        result += factors[i]
+        for j in range(i + 1, n):
+            factors[j] *= (x - points[i][0])
+    return result
+
+
+def newton_polynomial_for_domain(domain, n, points):
+    result = []
+    difference = []
+    divided_differences_table = []
+
+    # obliczenie tablicy roznic dzielonych, zaczynamy od kolumny wypelnionej wartosciami w wezlach
+    column_0 = [point[1] for point in points]
+    divided_differences_table.append(column_0)
+
+    # obliczenie kolejnych kolumn tablicy roznic dzielonych
+    for i in range(1, n):
+        column = []
+        for j in range(n - i):
+            value = divided_differences_table[i - 1][j + 1]
+            value -= divided_differences_table[i - 1][j]
+            value /= (points[j + i][0] - points[j][0])
+            column.append(value)
+        divided_differences_table.append(column)
+
+    # wspolczynniki to pierwsze wartosci w kazdej z kolumn tablicy roznic dzielonych
+    factors = [column[0] for column in divided_differences_table]
+
+    for x in domain:
+        result.append(newton_polynomial(x, n, factors.copy(), points))
+        difference.append(f(x) - result[-1])
+
+    print("norma maksimum roznicy wielomianu i funkcji (newton): " + str(maximum_norm(difference)))
+    return result
 
 
 def lagrange_polynomial(x, n, points):
@@ -23,26 +61,6 @@ def lagrange_polynomial(x, n, points):
     return result
 
 
-def newton_polynomial(x, n, points, factors):
-    result = 0
-    for i in range(n):
-        result += factors[i]
-        for j in range(i + 1, n):
-            factors[j] *= (x - points[i][0])
-    return result
-
-
-def calculate_factors(n, points):
-    factors = []
-    for i in range(n):
-        a_i = points[i][1]
-        for j in range(i):
-            a_i -= factors[j]
-            a_i /= (points[i][0] - points[j][0])
-        factors.append(a_i)
-    return factors
-
-
 def lagrange_polynomial_for_domain(domain, n, points):
     result = []
     difference = []
@@ -51,18 +69,6 @@ def lagrange_polynomial_for_domain(domain, n, points):
         difference.append(f(x) - result[-1])
 
     print("norma maksimum roznicy wielomianu i funkcji (legrange): " + str(maximum_norm(difference)))
-    return result
-
-
-def newton_polynomial_for_domain(domain, n, points):
-    result = []
-    difference = []
-    factors = calculate_factors(n, points)
-    for x in domain:
-        result.append(newton_polynomial(x, n, points, factors.copy()))
-        difference.append(f(x) - result[-1])
-
-    print("norma maksimum roznicy wielomianu i funkcji (newton): " + str(maximum_norm(difference)))
     return result
 
 
@@ -78,8 +84,9 @@ def f_for_domain(domain):
 
 
 def main():
-
-    for n in range(2, 21):
+    for n in range(2, 22):
+        if n == 21:
+            n = 30
 
         a = -5
         b = 10
@@ -99,12 +106,14 @@ def main():
         plt.subplots_adjust(hspace=0.5)
 
         plt.subplot(211)
+        plt.grid(True)
         plt.plot(domain, lagrange_polynomial_for_domain(domain, n, points), 'k-')
         plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
         plt.plot(domain, f_for_domain(domain), 'b--')
         plt.title('Wizualizacja interpolowanego wielomianu Lagrange\'a')
 
         plt.subplot(212)
+        plt.grid(True)
         plt.plot(domain, newton_polynomial_for_domain(domain, n, points), 'k-')
         plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
         plt.plot(domain, f_for_domain(domain), 'b--')
@@ -122,12 +131,14 @@ def main():
         plt.subplots_adjust(hspace=0.5)
 
         plt.subplot(211)
+        plt.grid(True)
         plt.plot(domain, lagrange_polynomial_for_domain(domain, n, points), 'k-')
         plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
         plt.plot(domain, f_for_domain(domain), 'b--')
         plt.title('Wizualizacja interpolowanego wielomianu Lagrange\'a')
 
         plt.subplot(212)
+        plt.grid(True)
         plt.plot(domain, newton_polynomial_for_domain(domain, n, points), 'k-')
         plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
         plt.plot(domain, f_for_domain(domain), 'b--')
