@@ -66,7 +66,7 @@ def calculate_factors_cubic(n, points, boundary_condition):
         v_value = 6 * (b[i] - b[i - 1])
         v.append(v_value)
 
-    if boundary_condition == 0:
+    if boundary_condition == 1:
         # pierwszy warunek brzegowy S"(t_0) = 0 and S"(t_n-1) = 0
 
         # metoda Thomasa dla naszej macierzy
@@ -149,12 +149,13 @@ def cubic_spline_for_domain(domain, n, points, boundary_condition):
         result.append(cubic_spline(x, n, points, factors))
         difference.append(f(x) - result[-1])
 
-    print("norma maksimum roznicy funkcji sklejanej (drugiego stopnia) i funkcji f: " + str(maximum_norm(difference)))
+    print("norma maksimum roznicy funkcji f i funkcji sklejanej (trzeciego stopnia), przy warunku brzegowym "
+          + str(boundary_condition) + ": " + str(maximum_norm(difference)))
     return result
 
 
 def choose_z0(boundary_condition, points):
-    if boundary_condition == 0:
+    if boundary_condition == 1:
         # pierwszy warunek brzegowy Q'(t0) = 0
         return 0
     else:
@@ -200,12 +201,15 @@ def quadratic_spline_for_domain(domain, n, points, boundary_condition):
         result.append(quadratic_spline(x, n, points, factors))
         difference.append(f(x) - result[-1])
 
-    print("norma maksimum roznicy funkcji sklejanej (drugiego stopnia) i funkcji f: " + str(maximum_norm(difference)))
+    print("norma maksimum roznicy funkcji f i funkcji sklejanej (drugiego stopnia), przy warunku brzegowym "
+          + str(boundary_condition) + ": " + str(maximum_norm(difference)))
     return result
 
 
 def main():
-    for n in range(4, 21):
+    for n in range(4, 22):
+        if n == 21:
+            n = 30
 
         a = -5
         b = 10
@@ -216,45 +220,53 @@ def main():
             x = a + i * step
             points.append((x, f(x)))
 
-        domain = np.linspace(a - 1, b + 1, num=1500)
+        domain = np.linspace(a, b, num=1900)
 
-        # warunek brzegowy 0 - dla kwadratowych Q'(t0) = 0, dla kubicznych S"(t_0) = 0 and S"(t_n-1) = 0
-        print('\n\n' + str(n) + ' wezlow, warunek brzegowy 0')
+        # warunki brzegowe dla splajnow kwadratowych
+        # 1) Q'(t0) = 0
+        # 2) Q"0 = 0
+        print('\n\n' + str(n) + ' wezlow, quadratic spline')
 
         fig = plt.figure(1)
-        fig.canvas.set_window_title(str(n) + ' wezlow, warunek brzegowy 0')
+        fig.canvas.set_window_title(str(n) + ' wezlow, quadratic spline')
         plt.subplots_adjust(hspace=0.5)
 
         plt.subplot(211)
-        plt.plot(domain, quadratic_spline_for_domain(domain, n, points, 0), 'k-')
-        plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
-        plt.plot(domain, f_for_domain(domain), 'b--')
-        plt.title('Wizualizacja interpolacji funkcja sklejana drugiego stopnia\'a')
-
-        plt.subplot(212)
-        plt.plot(domain, cubic_spline_for_domain(domain, n, points, 0), 'k-')
-        plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
-        plt.plot(domain, f_for_domain(domain), 'b--')
-        plt.title('Wizualizacja interpolacji funkcja sklejana trzeciego stopnia\'a')
-
-        # warunek brzegowy 1 - dla kwadratowych Q"(t0) = 0, dla kubicznych S'(t_0) = f'(t_0) and S'(t_n-1) = f'(t_n-1)
-        print('\n\n' + str(n) + ' wezlow, warunek brzegowy 1')
-
-        fig = plt.figure(2)
-        fig.canvas.set_window_title(str(n) + ' wezlow, warunek brzegowy 1')
-        plt.subplots_adjust(hspace=0.5)
-
-        plt.subplot(211)
+        plt.grid(True)
         plt.plot(domain, quadratic_spline_for_domain(domain, n, points, 1), 'k-')
         plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
         plt.plot(domain, f_for_domain(domain), 'b--')
-        plt.title('Wizualizacja interpolacji funkcja sklejana drugiego stopnia\'a')
+        plt.title('Funkcja sklejana drugiego stopnia, warunek brzegowy 1')
 
         plt.subplot(212)
+        plt.grid(True)
+        plt.plot(domain, quadratic_spline_for_domain(domain, n, points, 2), 'k-')
+        plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
+        plt.plot(domain, f_for_domain(domain), 'b--')
+        plt.title('Funkcja sklejana drugiego stopnia, warunek brzegowy 2')
+
+        # warunki brzegowe dla splajnow kubicznych
+        # 1) S"(t_0) = 0, S"(t_n-1) = 0
+        # 2) S'(t_0) = f'(t_0), S'(t_n-1) = f'(t_n-1)
+        print('\n\n' + str(n) + ' wezlow, cubic spline')
+
+        fig = plt.figure(2)
+        fig.canvas.set_window_title(str(n) + ' wezlow, cubic spline')
+        plt.subplots_adjust(hspace=0.5)
+
+        plt.subplot(211)
+        plt.grid(True)
         plt.plot(domain, cubic_spline_for_domain(domain, n, points, 1), 'k-')
         plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
         plt.plot(domain, f_for_domain(domain), 'b--')
-        plt.title('Wizualizacja interpolacji funkcja sklejana trzeciego stopnia\'a')
+        plt.title('Funkcja sklejana trzeciego stopnia, warunek brzegowy 1')
+
+        plt.subplot(212)
+        plt.grid(True)
+        plt.plot(domain, cubic_spline_for_domain(domain, n, points, 2), 'k-')
+        plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
+        plt.plot(domain, f_for_domain(domain), 'b--')
+        plt.title('Funkcja sklejana trzeciego stopnia, warunek brzegowy 2')
 
         plt.show()
 
