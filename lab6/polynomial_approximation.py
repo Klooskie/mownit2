@@ -21,7 +21,6 @@ def euclidean_norm(vector):
 
 def f(x):
     return sin(4 * x / pi) * exp(-0.2 * x / pi)
-    # return x * x - 6 * cos(pi * x)
 
 
 def f_for_domain(domain):
@@ -78,13 +77,11 @@ def least_squares_approximation_for_domain(domain, n, points, degree):
 
 
 def main():
-    for n in range(20, 21):
-        for degree in range(1, 9):
+    for n in range(30, 31):
+        for degree in range(3, 23):
 
             a = -5
             b = 10
-            # a = -2 * pi
-            # b = 2 * pi
 
             points = []
             step = (b - a) / (n - 1)
