@@ -3,20 +3,20 @@ import matplotlib.pyplot as plt
 import sys
 from math import sin, cos, pi, exp
 
+# parametry zadania
+m = 2
+
 
 def maximum_norm(vector):
-    m = 0
+    maximum = 0
     for x in vector:
-        if abs(x) > m:
-            m = abs(x)
-    return m
+        if abs(x) > maximum:
+            maximum = abs(x)
+    return maximum
 
 
 def solution(x):
-    m = 5
-    k = 10
-    # return exp(x)
-    return 0
+    return cos(m * x) - x * sin(m * x)
 
 
 def solution_for_domain(domain):
@@ -54,31 +54,38 @@ def finite_difference_method_for_domain(domain, n, x_0, x_k, a, b):
         x_col.append(x_0 + i * step)
     x_col.append(x_k)
 
-    # stworzenie 3 kolumn macierzy trojdiagonalnej ukladu rownan
+    # stworzenie 3 kolumn macierzy trojdiagonalnej ukladu rownan i wektora wyrazow wolnych
     col_1 = []
     col_2 = []
     col_3 = []
+    col_4 = []
 
     # wypelnienie macierzy trojdiagonalnej w zaleznosci od podanego rownania kolejno:
     # col_1 wspolczynnikami przy y_i-1
     # col_2 wspolczynnikami przy y_i
     # col_3 wspolczynnikami przy y_i+1
+    # col_4 prawa strona rownania
     for i in range(1, n):
-        col_1.append(1 / (1.5 ** 2))
-        col_2.append((-2) / (1.5 ** 2) - (1 / x_col[i]) * (1 / 1.5) - (1 / x_col[i] ** 2))
-        col_3.append(1 / (1.5 ** 2) + (1 / x_col[i]) * (1 / 1.5))
+        col_1.append(1 / (step ** 2))
+        col_2.append(((-2) / (step ** 2)) + m ** 2)
+        col_3.append(1 / (step ** 2))
+        col_4.append((-2) * m * cos(m * x_col[i]))
+
+    # zmiana wartosci w pierwszej i ostatniej komorce wektora wyrazow wolnych z uwzglednieniem warunkow brzegowych
+    col_4[0] -= col_1[0] * a
+    col_4[n-2] -= col_3[n-2] * b
 
     # algorytm Thomasa
     # obliczenie wspolczynnikow B_0 i Y_0
     b_factors = [-col_3[0] / col_2[0]]
-    y_factors = [-a * col_1[0] / col_2[0]]
+    y_factors = [col_4[0] / col_2[0]]
 
     # obliczenie kolejnych wspolczynnikow B i Y
     for i in range(1, n - 2):
         new_b_factor = -col_3[i]
         new_b_factor /= (col_1[i] * b_factors[-1] + col_2[i])
 
-        new_y_factor = 0 - col_1[i] * y_factors[-1]
+        new_y_factor = col_4[i] - col_1[i] * y_factors[-1]
         new_y_factor /= (col_1[i] * b_factors[-1] + col_2[i])
 
         b_factors.append(new_b_factor)
@@ -88,9 +95,9 @@ def finite_difference_method_for_domain(domain, n, x_0, x_k, a, b):
     y_col = [b]
 
     # obliczenie i dodanie do wyniku y(x_k-1)
-    last_x = (-b * col_3[n - 2]) - col_1[n - 2] * y_factors[-1]
-    last_x /= (col_1[n - 2] * b_factors[-1] + col_2[n - 2])
-    y_col.append(last_x)
+    last_y = col_4[n-2] - col_1[n - 2] * y_factors[-1]
+    last_y /= (col_1[n - 2] * b_factors[-1] + col_2[n - 2])
+    y_col.append(last_y)
 
     # obliczenie od konca kolejnych wartosci y(x)
     for i in range(n - 3, -1, -1):
@@ -100,12 +107,12 @@ def finite_difference_method_for_domain(domain, n, x_0, x_k, a, b):
     y_col.append(a)
     y_col.reverse()
 
-    # stworzenie listy krotek z obliczonymi koleinymi x i y(x)
+    # stworzenie listy obliczonych punktow nalezacych do wykresu y(x)
     points = []
     for i in range(n + 1):
         points.append((x_col[i], y_col[i]))
-    # print(points)
 
+    # obliczenie wartosci y(x) dla kazdego z punktow na wykresie (y(x) jest aproksymowana splineami 1 stopnia)
     for point in domain:
         result.append(finite_difference_method(point, points, n))
         difference.append(solution(point) - result[-1])
@@ -118,14 +125,13 @@ def finite_difference_method_for_domain(domain, n, x_0, x_k, a, b):
 
 def main():
     # liczba krokow na przedziale [x_0, x_k]
-    n = 3
+    n = 13
 
-    x_0 = 2
-    x_k = 6.5
-    # a = solution(x_0)
-    # b = solution(x_k)
-    a = 0.008
-    b = 0.003
+    # parametry zadania, przedzial to [x_0, x_k], y(x_0) = a, y(x_k) = b
+    x_0 = 0
+    x_k = (2 * pi + 2) / m
+    a = 1
+    b = solution(x_k)
 
     domain = np.linspace(x_0, x_k, num=1500)
 

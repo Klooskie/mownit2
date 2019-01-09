@@ -3,25 +3,32 @@ import matplotlib.pyplot as plt
 import sys
 from math import sin, cos, pi, exp
 
+# parametry zadania
+m = 2
+k = 4
+
 
 def maximum_norm(vector):
-    m = 0
+    maximum = 0
     for x in vector:
-        if abs(x) > m:
-            m = abs(x)
-    return m
+        if abs(x) > maximum:
+            maximum = abs(x)
+    return maximum
 
 
 def y_derivative(x, y):
-    m = 5
-    k = 10
-    return y
+    result = k * k * m * sin(m * x) * cos(m * x)
+    result += k * m * y * sin(m * x)
+
+    return result
 
 
 def solution(x):
-    m = 5
-    k = 10
-    return exp(x)
+    result = exp((-1) * k * cos(m * x))
+    result -= k * cos(m * x)
+    result += 1
+
+    return result
 
 
 def solution_for_domain(domain):
@@ -115,10 +122,11 @@ def runge_kutta_method_for_domain(domain, n, x_0, x_k, a):
 
 def main():
     # liczba krokow na przedziale [x_0, x_k]
-    n = 10
+    n = 50
 
-    x_0 = 0
-    x_k = 4
+    # parametry zadania, przedzial to [x_0, x_k], y(x_0) = a
+    x_0 = (-1) * pi / 4
+    x_k = 3 * pi / 2
     a = solution(x_0)
 
     domain = np.linspace(x_0, x_k, num=1500)
