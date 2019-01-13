@@ -25,7 +25,7 @@ def newton_polynomial_for_domain(domain, n, points):
     difference = []
     divided_differences_table = []
 
-    # obliczenie tablicy roznic dzielonych, zaczynamy od kolumny wypelnionej wartosciami w wezlach
+    # obliczenie tablicy roznic dzielonych, zaczynamy od kolumny wypelnionej wartosciami w wezlach 
     column_0 = [point[1] for point in points]
     divided_differences_table.append(column_0)
 

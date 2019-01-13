@@ -24,7 +24,7 @@ def hermite_polynomial_for_domain(domain, n, points):
     result = []
     difference = []
 
-    # tworzymy liste nowych iksow - podwajamy wystepowanie iksow wszystkich wezlow
+    # tworzymy liste nowych iksow - podwajamy wystepowanie iksow wszystkich wezlow 
     new_points = []
     for p in points:
         new_points.append(p[0])
