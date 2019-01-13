@@ -231,7 +231,7 @@ void newtons_method(number * start, number ro, int stopping_rule_number){
     number * proper_solution = find_matching_proper_solution(x1);
     cout << "delta " << maximum_norm(subtract_vectors(x1, proper_solution)) << endl;
 }
-
+ 
 int main(){
 
     number * start = new number [3];

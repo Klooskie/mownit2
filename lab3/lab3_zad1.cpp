@@ -17,7 +17,7 @@ number absolute(number x){
 }
 
 //f(x) = (x - 1) * e ^ (-16 * x) + x ^ 14
-//f(x) = 0 dla x = 0.522247
+//f(x) = 0 dla x = 0.522247 
 number f_function(number x){
 
     number f = exp((-16) * x);
