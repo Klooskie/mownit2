@@ -72,13 +72,16 @@ def least_squares_approximation_for_domain(domain, n, points, degree):
 
     print("norma euklidesowa roznicy funkcji aproksymowanej (" + str(degree) + " stopnia) i funkcji f: "
           + str(euclidean_norm(difference)))
+    # print(str(degree) + " stopien: " + str(euclidean_norm(difference)))
 
     return result
 
 
 def main():
-    for n in range(30, 31):
-        for degree in range(3, 23):
+    for n in range(5, 22):
+        for degree in [3, 5, 7, 10]:
+            if n == 21:
+                n = 30
 
             a = -5
             b = 10
@@ -92,7 +95,7 @@ def main():
             domain = np.linspace(a, b, num=15000)
 
             print('\n\n' + str(n) + ' wezlow, stopien wielomianu aproksymujacego - ' + str(degree)
-                  + 'wezly rownoodlegle')
+                  + ', wezly rownoodlegle')
 
             fig = plt.figure(1)
             fig.canvas.set_window_title(str(n) + ' wezlow, stopien wielomianu aproksymujacego - ' + str(degree))
@@ -104,6 +107,9 @@ def main():
             plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
             plt.plot(domain, f_for_domain(domain), 'b--')
             plt.title('Wizualizacja funkcji aproksymujacej ' + str(degree) + ' stopnia, wezly rownoodlegle')
+
+            print(str(n) + ' wezlow, stopien wielomianu aproksymujacego - ' + str(degree)
+                  + ', wezly Czebyszewa')
 
             points = []
             for i in range(1, n + 1):

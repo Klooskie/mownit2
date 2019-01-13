@@ -3,9 +3,6 @@ import matplotlib.pyplot as plt
 from math import sin, cos, pi, exp, sqrt
 
 
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!
-# https://eti.pg.edu.pl/documents/176593/26763380/Wykl_AlgorOblicz_3.pdf?fbclid=IwAR2umn_SX979LKGDNBRwRT0DgwU8CITpSmUFXPDZOaCNzwu_37So5DMBKIA
-
 def maximum_norm(vector):
     m = 0
     for x in vector:
@@ -24,7 +21,6 @@ def euclidean_norm(vector):
 
 def f(x):
     return sin(4 * x / pi) * exp(-0.2 * x / pi)
-    # return 2 * x ** 2 + 19 - 3 * x
 
 
 def f_for_domain(domain):
@@ -87,13 +83,16 @@ def trigonometric_approximation_for_domain(domain, n, points, degree):
 
     print("norma euklidesowa roznicy funkcji aproksymowanej (" + str(degree) + " stopnia) i funkcji f: "
           + str(euclidean_norm(difference)))
+    # print(str(degree) + " stopien: " + str(euclidean_norm(difference)))
 
     return result
 
 
 def main():
-    for n in range(5, 15):
-        for degree in range(7, 8):
+    for n in range(5, 22):
+        for degree in [3, 5, 7, 10]:
+            if n == 21:
+                n = 30
 
             a = -5
             b = 10
@@ -113,12 +112,27 @@ def main():
             fig.canvas.set_window_title(str(n) + ' wezlow, stopien wielomianu aproksymujacego - ' + str(degree))
             plt.subplots_adjust(hspace=0.5)
 
-            plt.subplot(1, 1, 1)
+            plt.subplot(2, 1, 1)
             plt.grid(True)
             plt.plot(domain, trigonometric_approximation_for_domain(domain, n, points, degree), 'k-')
             plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
             plt.plot(domain, f_for_domain(domain), 'b--')
-            plt.title('Wizualizacja funkcji aproksymujacej ' + str(degree) + ' stopnia, wezly rownoodlegle')
+            plt.title('Wizualizacja funkcji aproksymujacej ' + str(degree) + ' stopnia')
+
+            print(str(n) + ' wezlow, stopien wielomianu aproksymujacego - ' + str(degree)
+                  + ', wezly Czebyszewa')
+
+            points = []
+            for i in range(1, n + 1):
+                x = 0.5 * (a + b) + 0.5 * (b - a) * cos((2 * i - 1) * pi / (2 * n))
+                points.append((x, f(x)))
+
+            plt.subplot(2, 1, 2)
+            plt.grid(True)
+            plt.plot(domain, trigonometric_approximation_for_domain(domain, n, points, degree), 'k-')
+            plt.plot([point[0] for point in points], [point[1] for point in points], 'ro')
+            plt.plot(domain, f_for_domain(domain), 'b--')
+            plt.title('Wizualizacja funkcji aproksymujacej ' + str(degree) + ' stopnia, wezly Czebyszewa')
 
             plt.show()
 
