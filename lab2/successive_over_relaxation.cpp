@@ -87,7 +87,7 @@ void multiply(int n, number ** A, number * X, number * B){
 void print_vector_and_norms(int n, number * X, number * X2){
     
     // cout << "\nwyliczony wektor niewiadomych" << endl;    
-    // print_vector(n, X2);
+    // print_vector(n, X2); 
 
     cout << "\nnorma euklidesowa wektora zadanego " << euclidean_norm(n, X) << endl;
     cout << "norma euklidesowa wektora obliczonego " << euclidean_norm(n, X2) <<endl;

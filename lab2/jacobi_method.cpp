@@ -39,7 +39,7 @@ void print_augmented_matrix(int n, number ** A){
 }
 
 void fill_vector_X(int n, number * X){
-    // srand(time(NULL));
+    // srand(time(NULL)); 
     for(int i = 0; i < n; i++){
         if(rand() % 2)
             X[i] = 1;
