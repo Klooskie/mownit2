@@ -245,7 +245,7 @@ def main():
         plt.plot(domain, f_for_domain(domain), 'b--')
         plt.title('Funkcja sklejana drugiego stopnia, warunek brzegowy 2')
 
-        # warunki brzegowe dla splajnow kubicznych
+        # warunki brzegowe dla splajnow kubicznych 
         # 1) S"(t_0) = 0, S"(t_n-1) = 0
         # 2) S'(t_0) = f'(t_0), S'(t_n-1) = f'(t_n-1)
         print('\n\n' + str(n) + ' wezlow, cubic spline')
