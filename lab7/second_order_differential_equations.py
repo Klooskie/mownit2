@@ -73,7 +73,7 @@ def finite_difference_method_for_domain(domain, n, x_0, x_k, a, b):
 
     # zmiana wartosci w pierwszej i ostatniej komorce wektora wyrazow wolnych z uwzglednieniem warunkow brzegowych
     col_4[0] -= col_1[0] * a
-    col_4[n-2] -= col_3[n-2] * b
+    col_4[n - 2] -= col_3[n - 2] * b
 
     # algorytm Thomasa
     # obliczenie wspolczynnikow B_0 i Y_0
@@ -95,7 +95,7 @@ def finite_difference_method_for_domain(domain, n, x_0, x_k, a, b):
     y_col = [b]
 
     # obliczenie i dodanie do wyniku y(x_k-1)
-    last_y = col_4[n-2] - col_1[n - 2] * y_factors[-1]
+    last_y = col_4[n - 2] - col_1[n - 2] * y_factors[-1]
     last_y /= (col_1[n - 2] * b_factors[-1] + col_2[n - 2])
     y_col.append(last_y)
 
@@ -125,13 +125,15 @@ def finite_difference_method_for_domain(domain, n, x_0, x_k, a, b):
 
 def main():
     # liczba krokow na przedziale [x_0, x_k]
-    n = 13
+    n = 5
 
     # parametry zadania, przedzial to [x_0, x_k], y(x_0) = a, y(x_k) = b
     x_0 = 0
     x_k = (2 * pi + 2) / m
     a = 1
     b = solution(x_k)
+
+    print("\nRozpatrywany przedzial to: [" + str(x_0) + "; " + str(x_k) + "]\n")
 
     domain = np.linspace(x_0, x_k, num=1500)
 

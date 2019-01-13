@@ -122,12 +122,14 @@ def runge_kutta_method_for_domain(domain, n, x_0, x_k, a):
 
 def main():
     # liczba krokow na przedziale [x_0, x_k]
-    n = 50
+    n = 5000
 
     # parametry zadania, przedzial to [x_0, x_k], y(x_0) = a
     x_0 = (-1) * pi / 4
     x_k = 3 * pi / 2
     a = solution(x_0)
+
+    print("\nRozpatrywany przedzial to: [" + str(x_0) + "; " + str(x_k) + "]\n")
 
     domain = np.linspace(x_0, x_k, num=1500)
 
