@@ -394,8 +394,8 @@ int main(){
     cout << "wpisz rozmiar macierzy" << endl;
     cin >> n;
 
-    zad1(n);
+    // zad1(n);
     // zad2(n);
-    // zad3(n);
+    zad3(n);
 
 }
